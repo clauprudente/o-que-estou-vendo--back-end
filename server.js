@@ -23,9 +23,25 @@ servidor.get('/', (request, response) => {
     response.send('Servidor subiu \o/');
 });
 
-servidor.get('/usuario', async (request, response) => {
+servidor.get('/usuarios', async (request, response) => {
     usuariosController.getAll()
         .then(usuarios => response.send(usuarios))
+})
+
+servidor.post('/usuario', async (request, response) => {
+    usuariosController.add(request.body)
+        .then(usuario => {
+            const _id = usuario._id;
+            response.send(_id);
+        })
+        .catch(error => {
+            if (error.name === "ValidationError") {
+                response.sendStatus(400)
+            }
+            else {
+                response.sendStatus(500)
+            }
+        })
 })
 
 servidor.listen(PORT);
