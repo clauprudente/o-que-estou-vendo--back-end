@@ -10,6 +10,12 @@ const getAll = () => {
     });
 }
 
+const add = (usuario) => {
+    const novoUsuario = new usuariosModel(usuario);
+    return novoUsuario.save();
+}
+
 module.exports = {
-    getAll
+    getAll,
+    add
 }

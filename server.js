@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const servidor = express();
+const usuariosController = require('./usuariosController')
 
 const PORT = 3000;
 
@@ -28,7 +29,7 @@ servidor.get('/usuarios', async (request, response) => {
         .then(usuarios => response.send(usuarios))
 })
 
-servidor.post('/usuario', async (request, response) => {
+servidor.post('/usuarios', async (request, response) => {
     usuariosController.add(request.body)
         .then(usuario => {
             const _id = usuario._id;

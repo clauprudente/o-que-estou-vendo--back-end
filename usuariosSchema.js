@@ -4,8 +4,7 @@ const Schema = mongoose.Schema;
 const usuariosSchema = new Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
     email: { type: String, required: true },
-    senha: { type: String, required: true },
-    nome: { type: String },
+    senha: { type: String, required: true }
 });
 
 const usuariosModel = mongoose.model("usuarios", usuariosSchema);
