@@ -24,12 +24,12 @@ servidor.get('/', (request, response) => {
     response.send('Servidor subiu \o/');
 });
 
-servidor.get('/usuarios', async (request, response) => {
+servidor.get('/usuarios', (request, response) => {
     usuariosController.getAll()
         .then(usuarios => response.send(usuarios))
 })
 
-servidor.post('/usuarios', async (request, response) => {
+servidor.post('/usuarios', (request, response) => {
     usuariosController.add(request.body)
         .then(usuario => {
             const _id = usuario._id;
@@ -41,6 +41,30 @@ servidor.post('/usuarios', async (request, response) => {
             }
             else {
                 response.sendStatus(500)
+            }
+        })
+})
+
+servidor.get('/usuario/:usuarioId/livros', (request, response) => {
+    const usuarioId = request.params.usuarioId;
+    usuariosController.getAllLivros(usuarioId)
+        .then(livrosUsuario => response.send(livrosUsuario));
+})
+
+servidor.post('/usuario/:usuarioId/adicionar-livro', (request, response) => {
+    const usuarioId = request.params.usuarioId;
+    usuariosController.addLivros(usuarioId, request.body)
+        .then(usuario => {
+            const _id = usuario._id;
+            response.send(_id);
+        })
+        .catch(erro => {
+            if (erro.name === "ValidationError") {
+                response.sendStatus(400);
+            }
+            else {
+                console.log(erro);
+                response.sendStatus(500);
             }
         })
 })
