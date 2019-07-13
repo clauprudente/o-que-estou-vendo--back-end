@@ -1,6 +1,9 @@
 const { connect } = require('./repository');
 const usuariosModel = require('./usuariosSchema');
 const { filmesModel } = require('./filmesSchema');
+require('dotenv-safe').load()
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 connect();
 
@@ -11,10 +14,30 @@ const getAll = () => {
     });
 }
 
-const add = (usuario) => {
+const add = async(usuario) => {
+    const usuarioEncontrado = await usuariosModel.findOne({ email: usuario.email })
+
+    if (usuarioEncontrado) {
+        throw new Error('Email já cadastrado')
+    }
+    const salt = bcrypt.genSaltSync(10);
+    const senhaCriptografada = bcrypt.hashSync(usuario.senha, salt);
+    usuario.senha = senhaCriptografada;
+
     const novoUsuario = new usuariosModel(usuario);
     return novoUsuario.save();
 }
+
+const remove = (id) => {
+    return usuariosModel.findByIdAndDelete(id)
+}
+
+const update = (id, usuario) => {
+    return usuariosModel.findByIdAndUpdate(
+        id, { $set: usuario }, { new: true },
+    )
+}
+
 
 const getById = (id) => {
     return usuariosModel.findById(id);
@@ -34,7 +57,7 @@ const addFilmes = async(usuarioId, filmes) => {
 }
 
 const login = async(dadosDoLogin) => {
-    const usuarioEncontrado = await filmesModel.findOne({ email: dadosDoLogin.email })
+    const usuarioEncontrado = await usuariosModel.findOne({ email: dadosDoLogin.email })
 
     if (usuarioEncontrado) {
         const senhaCorreta = bcrypt.compareSync(
@@ -46,14 +69,14 @@ const login = async(dadosDoLogin) => {
                     email: usuarioEncontrado.email,
                     id: usuarioEncontrado._id
                 },
-                process.env.PRIVATE_KEY
+                process.env.PRIVATE_KEY, { expiresIn: 60 }
             )
             return { auth: true, token };
         } else {
-            throw new Error('Dados incorretos')
+            throw new Error('Senha incorreta, prestenção parça')
         }
     } else {
-        throw new Error('Dados incorretos')
+        throw new Error('Email não está cadastrado')
     }
 }
 
@@ -62,5 +85,8 @@ module.exports = {
     add,
     getAllFilmes,
     addFilmes,
-    login
+    login,
+    getById,
+    update,
+    remove
 }
