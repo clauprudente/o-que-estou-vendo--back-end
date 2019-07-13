@@ -38,22 +38,21 @@ servidor.post('/usuarios', (request, response) => {
         .catch(error => {
             if (error.name === "ValidationError") {
                 response.sendStatus(400)
-            }
-            else {
+            } else {
                 response.sendStatus(500)
             }
         })
 })
 
-servidor.get('/usuario/:usuarioId/livros', (request, response) => {
+servidor.get('/usuario/:usuarioId/filmes', (request, response) => {
     const usuarioId = request.params.usuarioId;
-    usuariosController.getAllLivros(usuarioId)
-        .then(livrosUsuario => response.send(livrosUsuario));
+    usuariosController.getAllFilmes(usuarioId)
+        .then(filmesUsuario => response.send(filmesUsuario));
 })
 
-servidor.post('/usuario/:usuarioId/adicionar-livro', (request, response) => {
+servidor.post('/usuario/:usuarioId/adicionar-filme', (request, response) => {
     const usuarioId = request.params.usuarioId;
-    usuariosController.addLivros(usuarioId, request.body)
+    usuariosController.addFilmes(usuarioId, request.body)
         .then(usuario => {
             const _id = usuario._id;
             response.send(_id);
@@ -61,10 +60,25 @@ servidor.post('/usuario/:usuarioId/adicionar-livro', (request, response) => {
         .catch(erro => {
             if (erro.name === "ValidationError") {
                 response.sendStatus(400);
-            }
-            else {
+            } else {
                 console.log(erro);
                 response.sendStatus(500);
+            }
+        })
+})
+
+servidor.post('/usuario/login', (request, response) => {
+    usuariosController.login(request.body)
+        .then(respostaDoLogin => {
+            response.send(respostaDoLogin)
+        })
+        .catch(erro => {
+            if (erro.name === "ValidationError") {
+                console.log(erro);
+                response.sendStatus(400);
+            } else {
+                console.log(erro);
+                response.sendStatus(500)
             }
         })
 })
