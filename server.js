@@ -7,7 +7,7 @@ const params = require('params')
 const parametrosPermitidos = require('./parametrosPermitidos')
 const jwt = require('jsonwebtoken')
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000
 
 const logger = (request, response, next) => {
     console.log(`${new Date().toISOString()} Request type: ${request.method} to ${request.originalUrl}`);
