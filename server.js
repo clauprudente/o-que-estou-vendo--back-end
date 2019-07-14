@@ -103,7 +103,7 @@ servidor.post('/usuarios', (request, response) => {
             if (error.name === "ValidationError") {
                 response.sendStatus(400)
             } else {
-                response.sendStatus(500)
+                response.status(500).send(erro)
             }
         })
 })
