@@ -5,8 +5,8 @@ const servidor = express();
 const usuariosController = require('./usuariosController');
 const params = require('params')
 const parametrosPermitidos = require('./parametrosPermitidos')
-    // const jwt = require('jsonwebtoken')
-
+const jwt = require('jsonwebtoken')
+let auth = false
 
 const PORT = 3000;
 
@@ -19,6 +19,24 @@ const logger = (request, response, next) => {
 
     next();
 }
+
+const authentication = (request, response) => {
+    const authHeader = request.get('authorization')
+    if (authHeader) {
+        const token = authHeader.split(' ')[1]
+        jwt.verify(token, process.env.PRIVATE_KEY, function(error, decoded) {
+            if (error) {
+                response.send(403)
+            } else {
+                auth = true;
+                request.userId = decoded.id
+            }
+        })
+    } else {
+        response.send(401);
+    }
+}
+
 
 servidor.use(cors());
 servidor.use(bodyParser.json());
@@ -109,27 +127,36 @@ servidor.post('/usuarios', (request, response) => {
         })
 })
 
-servidor.get('/usuario/:usuarioId/filmes', (request, response) => {
-    const usuarioId = request.params.usuarioId;
-    usuariosController.getAllFilmes(usuarioId)
-        .then(filmesUsuario => response.send(filmesUsuario));
+servidor.get('/usuario/filmes', (request, response) => {
+    authentication(request, response);
+    if (auth) {
+        const usuarioId = request.userId;
+        usuariosController.getAllFilmes(usuarioId)
+            .then(filmesUsuario => response.json({
+                message: 'Successful log in',
+                filmesUsuario
+            }));
+    }
 })
 
-servidor.post('/usuario/:usuarioId/adicionar-filme', (request, response) => {
-    const usuarioId = request.params.usuarioId;
-    usuariosController.addFilmes(usuarioId, request.body)
-        .then(usuario => {
-            const _id = usuario._id;
-            response.send(_id);
-        })
-        .catch(erro => {
-            if (erro.name === "ValidationError") {
-                response.sendStatus(400);
-            } else {
-                console.log(erro);
-                response.sendStatus(500);
-            }
-        })
+servidor.post('/usuario/adicionar-filme', (request, response) => {
+    authentication(request, response);
+    if (auth) {
+        const usuarioId = request.userId;
+        usuariosController.addFilmes(usuarioId, request.body)
+            .then(usuario => {
+                const _id = usuario._id;
+                response.send(_id);
+            })
+            .catch(erro => {
+                if (erro.name === "ValidationError") {
+                    response.sendStatus(400);
+                } else {
+                    console.log(erro);
+                    response.sendStatus(500);
+                }
+            })
+    }
 })
 
 servidor.post('/usuario/login', (request, response) => {
@@ -144,9 +171,13 @@ servidor.post('/usuario/login', (request, response) => {
             } else {
                 console.log(erro);
                 response.sendStatus(500)
-            }
-        })
-})
+            };
+        });
+});
+
+servidor.get('/usuario/logout', (request, response) => {
+    response.status(200).send(usuariosController.logout());
+});
 
 servidor.listen(PORT);
 console.info(`Rodando na porta ${PORT}`);

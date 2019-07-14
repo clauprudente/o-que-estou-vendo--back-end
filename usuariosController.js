@@ -58,20 +58,17 @@ const addFilmes = async(usuarioId, filmes) => {
 
 const login = async(dadosDoLogin) => {
     const usuarioEncontrado = await usuariosModel.findOne({ email: dadosDoLogin.email })
-    const idUsuario = usuarioEncontrado._id;
     if (usuarioEncontrado) {
         const senhaCorreta = bcrypt.compareSync(
             dadosDoLogin.senha, usuarioEncontrado.senha
         )
-
         if (senhaCorreta) {
             const token = jwt.sign({
-                    email: usuarioEncontrado.email,
                     id: usuarioEncontrado._id
                 },
-                process.env.PRIVATE_KEY, { expiresIn: 60 }
+                process.env.PRIVATE_KEY, { expiresIn: 600 }
             )
-            return { auth: true, token, idUsuario };
+            return { auth: true, token };
         } else {
             throw new Error('Senha incorreta, prestenção parça')
         }
@@ -79,6 +76,11 @@ const login = async(dadosDoLogin) => {
         throw new Error('Email não está cadastrado')
     }
 }
+
+const logout = () => {
+    return { auth: false, token: null }
+}
+
 
 module.exports = {
     getAll,
@@ -88,5 +90,6 @@ module.exports = {
     login,
     getById,
     update,
-    remove
+    remove,
+    logout
 }
