@@ -132,21 +132,21 @@ servidor.post('/usuario/:usuarioId/adicionar-filme', (request, response) => {
         })
 })
 
-// servidor.post('/usuario/login', (request, response) => {
-//     usuariosController.login(request.body)
-//         .then(respostaDoLogin => {
-//             response.send(respostaDoLogin)
-//         })
-//         .catch(erro => {
-//             if (erro.name === "ValidationError") {
-//                 console.log(erro);
-//                 response.sendStatus(400);
-//             } else {
-//                 console.log(erro);
-//                 response.sendStatus(500)
-//             }
-//         })
-// })
+servidor.post('/usuario/login', (request, response) => {
+    usuariosController.login(request.body)
+        .then(respostaDoLogin => {
+            response.send(respostaDoLogin)
+        })
+        .catch(erro => {
+            if (erro.name === "ValidationError") {
+                console.log(erro);
+                response.sendStatus(400);
+            } else {
+                console.log(erro);
+                response.sendStatus(500)
+            }
+        })
+})
 
 servidor.listen(PORT);
 console.info(`Rodando na porta ${PORT}`);

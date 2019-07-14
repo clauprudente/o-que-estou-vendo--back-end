@@ -58,7 +58,7 @@ const addFilmes = async(usuarioId, filmes) => {
 
 const login = async(dadosDoLogin) => {
     const usuarioEncontrado = await usuariosModel.findOne({ email: dadosDoLogin.email })
-
+    const idUsuario = usuarioEncontrado._id;
     if (usuarioEncontrado) {
         const senhaCorreta = bcrypt.compareSync(
             dadosDoLogin.senha, usuarioEncontrado.senha
@@ -71,7 +71,7 @@ const login = async(dadosDoLogin) => {
                 },
                 process.env.PRIVATE_KEY, { expiresIn: 60 }
             )
-            return { auth: true, token };
+            return { auth: true, token, idUsuario };
         } else {
             throw new Error('Senha incorreta, prestenção parça')
         }
