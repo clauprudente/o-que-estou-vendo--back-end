@@ -118,7 +118,8 @@ servidor.get('/usuario/filmes', (request, response) => {
             if (error) {
                 response.sendStatus(403)
             } else {
-                auth = true
+                auth = true;
+                request.userId = decoded.id
             }
         })
     } else {
@@ -126,7 +127,7 @@ servidor.get('/usuario/filmes', (request, response) => {
     }
 
     if (auth) {
-        const usuarioId = request.usuarioId;
+        const usuarioId = request.userId;
         usuariosController.getAllFilmes(usuarioId)
             .then(filmesUsuario => response.send(filmesUsuario));
     }
