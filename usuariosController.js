@@ -66,7 +66,7 @@ const login = async(dadosDoLogin) => {
         )
         if (senhaCorreta) {
             const token = jwt.sign({
-                    email: consumidorEncontrado.email,
+                    email: usuarioEncontrado.email,
                     id: usuarioEncontrado._id
                 },
                 process.env.PRIVATE_KEY

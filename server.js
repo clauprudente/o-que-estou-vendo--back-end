@@ -180,7 +180,7 @@ servidor.post('/usuario/login', (request, response) => {
                 response.sendStatus(400);
             } else {
                 console.log(erro);
-                response.status(502).send(erro)
+                response.sendStatus(500);
             };
         });
 });
