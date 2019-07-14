@@ -68,7 +68,7 @@ const login = async(dadosDoLogin) => {
             const token = jwt.sign({
                     id: usuarioEncontrado._id
                 },
-                process.env.PRIVATE_KEY, { expiresIn: 600 }
+                process.env.PRIVATE_KEY
             )
             return { auth: true, token };
         } else {
