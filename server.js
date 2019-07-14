@@ -6,7 +6,6 @@ const usuariosController = require('./usuariosController');
 const params = require('params')
 const parametrosPermitidos = require('./parametrosPermitidos')
 const jwt = require('jsonwebtoken')
-let auth = false
 
 const PORT = 3000;
 
@@ -19,24 +18,6 @@ const logger = (request, response, next) => {
 
     next();
 }
-
-const authentication = (request, response) => {
-    const authHeader = request.get('authorization')
-    if (authHeader) {
-        const token = authHeader.split(' ')[1]
-        jwt.verify(token, process.env.PRIVATE_KEY, function(error, decoded) {
-            if (error) {
-                response.send(403)
-            } else {
-                auth = true;
-                request.userId = decoded.id
-            }
-        })
-    } else {
-        response.send(401);
-    }
-}
-
 
 servidor.use(cors());
 servidor.use(bodyParser.json());
@@ -128,19 +109,47 @@ servidor.post('/usuarios', (request, response) => {
 })
 
 servidor.get('/usuario/filmes', (request, response) => {
-    authentication(request, response);
+    const authHeader = request.get('authorization')
+    let auth = false
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1]
+        jwt.verify(token, process.env.PRIVATE_KEY, function(error, decoded) {
+            if (error) {
+                response.sendStatus(403)
+            } else {
+                auth = true
+            }
+        })
+    } else {
+        response.send(401)
+    }
+
     if (auth) {
-        const usuarioId = request.userId;
+        const usuarioId = request.usuarioId;
         usuariosController.getAllFilmes(usuarioId)
-            .then(filmesUsuario => response.json({
-                message: 'Successful log in',
-                filmesUsuario
-            }));
+            .then(filmesUsuario => response.send(filmesUsuario));
     }
 })
 
 servidor.post('/usuario/adicionar-filme', (request, response) => {
-    authentication(request, response);
+    const authHeader = request.get('authorization')
+    let auth = false
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1]
+        jwt.verify(token, process.env.PRIVATE_KEY, function(error, decoded) {
+            if (error) {
+                response.sendStatus(403)
+            } else {
+                auth = true;
+                request.userId = decoded.id
+            }
+        })
+    } else {
+        response.send(401)
+    }
+
     if (auth) {
         const usuarioId = request.userId;
         usuariosController.addFilmes(usuarioId, request.body)

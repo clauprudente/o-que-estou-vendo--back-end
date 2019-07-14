@@ -44,8 +44,10 @@ const getById = (id) => {
 }
 
 const getAllFilmes = async(usuarioId) => {
-    const usuario = await getById(usuarioId);
-    return usuario.filmes;
+    const usuario = await getById(usuarioId)
+    if (usuario) {
+        return usuario.filmes;
+    }
 }
 
 const addFilmes = async(usuarioId, filmes) => {
