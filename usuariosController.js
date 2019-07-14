@@ -66,6 +66,7 @@ const login = async(dadosDoLogin) => {
         )
         if (senhaCorreta) {
             const token = jwt.sign({
+                    email: consumidorEncontrado.email,
                     id: usuarioEncontrado._id
                 },
                 process.env.PRIVATE_KEY
@@ -79,11 +80,6 @@ const login = async(dadosDoLogin) => {
     }
 }
 
-const logout = () => {
-    return { auth: false, token: null }
-}
-
-
 module.exports = {
     getAll,
     add,
@@ -92,6 +88,5 @@ module.exports = {
     login,
     getById,
     update,
-    remove,
-    logout
+    remove
 }
